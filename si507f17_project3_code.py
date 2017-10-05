@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import unittest
 import requests
 
+
 #########
 ## Instr note: the outline comments will stay as suggestions, otherwise it's too difficult.
 ## Of course, it could be structured in an easier/neater way, and if a student decides to commit to that, that is OK.
@@ -13,8 +14,20 @@ import requests
 ######### PART 0 #########
 
 # Write your code for Part 0 here.
+try:
+	kitty_data = open("gallery.html",'r').read()
+except:
+	kitty_data = requests.get("http://newmantaylor.com/gallery.html").text #get response object that represents the literal text
+	f = open("gallery.html",'w') #these three lines open up an file and save it, don't have to open up the data all the time, file object
+	f.write(kitty_data)
+	f.close()
 
+soup = BeautifulSoup(kitty_data, 'html.parser')
+# print(soup)
 
+all_imgs = soup.find_all('img')
+for text in all_imgs:
+	print(text.get('alt',"No alternative text provided!"))
 ######### PART 1 #########
 
 # Get the main page data...
@@ -26,9 +39,33 @@ import requests
 # that the rest of the program can access.
 
 # We've provided comments to guide you through the complex try/except, but if you prefer to build up the code to do this scraping and caching yourself, that is OK.
+try:
+	nps_gov_data = open("nps_gov_data.html",'r').read()
+except:
+	nps_gov_data = requests.get("https://www.nps.gov/index.htm").text
+	f = open("nps_gov_data.html",'w') 
+	f.write(nps_gov_data)
+	f.close()
+
+park_soup = BeautifulSoup(nps_gov_data, 'html.parser')
+# print(park_soup)
+
+states_dropdown = park_soup.find("ul",{"class":"dropdown-menu SearchBar-keywordSearch"})
+# print (states_dropdown)
 
 
+states_links = states_dropdown.find_all("a")
+# print (states_links)
 
+# print (park_soup.find('a', href = True, text = "Michigan"))
+
+
+three_states = ['Arkansas','California','Michigan']
+three_links = [park_soup.find('a', text = states)['href'] for states in three_states]
+print (three_links)
+# for item in states_links:
+# 	states_name = item.text
+# 	if three_states in states_name:
 
 
 
