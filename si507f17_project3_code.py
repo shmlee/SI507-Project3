@@ -278,16 +278,19 @@ for item in mic_list:
 ######### PART 4 #########
 with open('arkansas.csv', 'w', newline='') as f:
 	writer = csv.writer(f)
+	f.write("Name, Location, Type, Address, Description\n")
 	for obj in arkansas_natl_sites:
 		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
 
 with open('california.csv', 'w', newline='') as f:
 	writer = csv.writer(f)
+	f.write("Name, Location, Type, Address, Description\n")
 	for obj in california_natl_sites:
 		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
 
 with open('michigan.csv', 'w', newline='') as f:
 	writer = csv.writer(f)
+	f.write("Name, Location, Type, Address, Description\n")
 	for obj in michigan_natl_sites:
 		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
 
