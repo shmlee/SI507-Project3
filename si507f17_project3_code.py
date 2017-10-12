@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import unittest
 import requests
+import csv
 
 
 #########
@@ -56,7 +57,6 @@ states_dropdown = park_soup.find("ul",{"class":"dropdown-menu SearchBar-keywordS
 
 states_links = states_dropdown.find_all("a")
 # print (states_links)
-
 # print (park_soup.find('a', href = True, text = "Michigan"))
 
 
@@ -160,9 +160,6 @@ def get_park_list(state_soup):
  	soup_list = state_soup.find("ul", {"id":"list_parks"}).find_all("li", {"class":"clearfix"})
  	return soup_list
 
-
-# print (sample_ark)
-
   
 class NationalSite(object):
 	def __init__(self, park_soup):
@@ -181,8 +178,7 @@ class NationalSite(object):
 		# print (links)
 
 	def __str__(self):
-		# print(self.name, self.location)
-		return "{} | {}".format(self.name, self.location)
+	 	return "{} | {}".format(self.name, self.location)
 
 
 	def __contains__(self, any_name):
@@ -205,27 +201,17 @@ class NationalSite(object):
 
 		print (mailing_address)
 
-sample_cal = get_park_list(california_soup)[2]	
-sample_test = NationalSite(sample_cal)
-info = requests.get(sample_test.url).text
-info_soup = BeautifulSoup(info, 'html.parser')	
-info_div = info_soup.find('div', {'itemprop':'address'})
-address_div = info_div.find('span', {'itemprop':'streetAddress'}).text.strip()
-locality = info_div.find('span', {'itemprop':'addressLocality'}).text.strip()
-region = info_div.find('span', {'itemprop':'addressRegion'}).text.strip()
-zipcode = info_div.find('span', {'itemprop':'postalCode'}).text.strip()
-mailing_address = address_div + "/" + region + "/" + zipcode
-print (mailing_address)
-
-	
-
-
-
-# sample_cal = get_park_list(california_soup)[0]	
+# sample_cal = get_park_list(california_soup)[2]	
 # sample_test = NationalSite(sample_cal)
-# print (sample_test)
-# print (sample_test.url)
-# print (sample_test.get_mailing_address())
+# info = requests.get(sample_test.url).text
+# info_soup = BeautifulSoup(info, 'html.parser')	
+# info_div = info_soup.find('div', {'itemprop':'address'})
+# address_div = info_div.find('span', {'itemprop':'streetAddress'}).text.strip()
+# locality = info_div.find('span', {'itemprop':'addressLocality'}).text.strip()
+# region = info_div.find('span', {'itemprop':'addressRegion'}).text.strip()
+# zipcode = info_div.find('span', {'itemprop':'postalCode'}).text.strip()
+# mailing_address = address_div + "/" + region + "/" + zipcode
+# print (mailing_address)
 
 
 
@@ -244,6 +230,38 @@ print (mailing_address)
 
 # HINT: Get a Python list of all the HTML BeautifulSoup instances that represent each park, for each state.
 
+ark_list = get_park_list(arkansas_soup)
+arkansas_natl_sites = NationalSite(ark_list)
+
+arkansas_natl_sites = []
+for item in ark_list:
+	ark_object = NationalSite(item)
+	arkansas_natl_sites.append(ark_object)
+	# print (arkansas_natl_sites)
+
+
+cal_list = get_park_list(california_soup)
+california_natl_sites = NationalSite(cal_list)
+
+california_natl_sites = []
+for item in cal_list:
+	cal_object = NationalSite(item)
+	california_natl_sites.append(cal_object)
+	# print (california_natl_sites)
+
+
+mic_list = get_park_list(michigan_soup)
+michigan_natl_sites = NationalSite(mic_list)
+
+michigan_natl_sites = []
+for item in mic_list:
+	mic_object = NationalSite(item)
+	michigan_natl_sites.append(mic_object)
+	# print (michigan_natl_sites)
+
+
+
+
 
 
 
@@ -258,6 +276,20 @@ print (mailing_address)
 
 
 ######### PART 4 #########
+with open('arkansas.csv', 'w', newline='') as f:
+	writer = csv.writer(f)
+	for obj in arkansas_natl_sites:
+		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
+
+with open('california.csv', 'w', newline='') as f:
+	writer = csv.writer(f)
+	for obj in california_natl_sites:
+		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
+
+with open('michigan.csv', 'w', newline='') as f:
+	writer = csv.writer(f)
+	for obj in michigan_natl_sites:
+		writer.writerow([obj.name, obj.location, obj.type, obj.get_mailing_address(), obj.description])
 
 ## Remember the hints / things you learned from Project 2 about writing CSV files from lists of objects!
 
