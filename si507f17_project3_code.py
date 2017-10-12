@@ -62,12 +62,35 @@ states_links = states_dropdown.find_all("a")
 
 three_states = ['Arkansas','California','Michigan']
 three_links = [park_soup.find('a', text = states)['href'] for states in three_states]
-print (three_links)
-# for item in states_links:
-# 	states_name = item.text
-# 	if three_states in states_name:
+count = 0
+for state in three_links:
+	link = "https://www.nps.gov" + state
+	# print (link)
+	try:
+		park_data = open(link,'r').read()
+	except:
+		park_data = requests.get(link).text
+		# print(park_data)
+		name_state = str(three_states[count]) 
+		name = name_state.lower() + "_data.html"
+		f = open(name,'w') 
+		f.write(park_data)
+		f.close()
+		soup_name = BeautifulSoup(park_data, "html.parser")
+		# print (NationalSite(soup_name))
+		count +=1
+		
 
+# print (three_links)
 
+arkansas_data = open("arkansas_data.html",'r').read()
+arkansas_soup = BeautifulSoup(arkansas_data, 'html.parser')
+# print(park_soup)
+california_data = open("california_data.html", 'r').read()
+california_soup = BeautifulSoup(california_data, 'html.parser')
+
+michigan_data = open("michigan_data.html", 'r').read()
+michigan_soup = BeautifulSoup(michigan_data, 'html.parser')
 
 # Get individual states' data...
 
@@ -133,7 +156,76 @@ print (three_links)
 
 
 ## Define your class NationalSite here:
+def get_park_list(state_soup):
+ 	soup_list = state_soup.find("ul", {"id":"list_parks"}).find_all("li", {"class":"clearfix"})
+ 	return soup_list
 
+
+# print (sample_ark)
+
+  
+class NationalSite(object):
+	def __init__(self, park_soup):
+		try:
+			self.location = park_soup.find("h4").get_text()
+			self.name = park_soup.find("h3").get_text()
+			self.type = park_soup.find("h2").get_text()
+			links = park_soup.find_all("a")[2]
+			self.url = links['href']
+			# self.links = park_soup.find_all("a")[2]["href"]
+			self.description = park_soup.find("p").get_text()
+		except:
+			self.type = None
+			self.description = None
+
+		# print (links)
+
+	def __str__(self):
+		# print(self.name, self.location)
+		return "{} | {}".format(self.name, self.location)
+
+
+	def __contains__(self, any_name):
+		return any_name in self.name
+
+	def get_mailing_address(self):
+		try:
+			info = requests.get(self.url).text
+			info_soup = BeautifulSoup(info, 'html.parser')
+			info_div = info_soup.find('div', {'itemprop':'address'})
+			address_div = info_div.find('span', {'itemprop':'streetAddress'}).text.strip()
+			locality = info_div.find('span', {'itemprop':'addressLocality'}).text.strip()
+			region = info_div.find('span', {'itemprop':'addressRegion'}).text.strip()
+			zipcode = info_div.find('span', {'itemprop':'postalCode'}).text.strip()
+			mailing_address = address_div + "/" + region + "/" + zipcode
+			return mailing_address 
+		except:
+			return ""
+
+
+		print (mailing_address)
+
+sample_cal = get_park_list(california_soup)[2]	
+sample_test = NationalSite(sample_cal)
+info = requests.get(sample_test.url).text
+info_soup = BeautifulSoup(info, 'html.parser')	
+info_div = info_soup.find('div', {'itemprop':'address'})
+address_div = info_div.find('span', {'itemprop':'streetAddress'}).text.strip()
+locality = info_div.find('span', {'itemprop':'addressLocality'}).text.strip()
+region = info_div.find('span', {'itemprop':'addressRegion'}).text.strip()
+zipcode = info_div.find('span', {'itemprop':'postalCode'}).text.strip()
+mailing_address = address_div + "/" + region + "/" + zipcode
+print (mailing_address)
+
+	
+
+
+
+# sample_cal = get_park_list(california_soup)[0]	
+# sample_test = NationalSite(sample_cal)
+# print (sample_test)
+# print (sample_test.url)
+# print (sample_test.get_mailing_address())
 
 
 
